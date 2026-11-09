@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="form-box">
+
+    <h1>Oops!</h1>
+
+    <h2>Something went wrong.</h2>
+
+    <p>{{ message }}</p>
+
+    <a class="button-link" href="{{ url_for('dashboard') }}">
+        Back to Dashboard
+    </a>
+
+    <a class="button-link" href="{{ url_for('login') }}">
+        Go to Login
+    </a>
+
+</div>
+
+{% endblock %}

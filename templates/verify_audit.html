@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audit Verification - TrustVault</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px #ddd;
+        }
+
+        h2 {
+            color: #263b5e;
+        }
+
+        .result {
+            padding: 15px;
+            background: #eef3f8;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .item {
+            margin: 15px 0;
+        }
+
+        a {
+            color: #2457a6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>TrustVault Audit Verification</h2>
+
+    <div class="result">
+        <h3>{{ result_status }}</h3>
+        <p>{{ message }}</p>
+    </div>
+
+    <div class="item">
+        <strong>Chain Links:</strong>
+        {{ "Intact" if status.chain_ok else "Failed" }}
+    </div>
+
+    <div class="item">
+        <strong>Verified New Records:</strong>
+        {{ status.verified_count }}
+    </div>
+
+    <div class="item">
+        <strong>Legacy Records:</strong>
+        {{ status.legacy_count }}
+    </div>
+
+    <hr>
+
+    <p>
+        <a href="{{ url_for('audit_trail') }}">
+            Back to Audit Trail
+        </a>
+    </p>
+
+    <p>
+        <a href="{{ url_for('admin') }}">
+            Back to Admin Dashboard
+        </a>
+    </p>
+
+</div>
+
+</body>
+</html>

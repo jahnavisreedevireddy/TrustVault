@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="form-box">
+
+    <h1>Create Account</h1>
+    <p>Register with TrustVault</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label>Username</label>
+        <input
+            type="text"
+            name="username"
+            placeholder="Enter your username"
+            required
+        >
+
+        <label>Email Address</label>
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+        >
+
+        <label>Password</label>
+        <input
+            type="password"
+            name="password"
+            placeholder="Create a strong password"
+            minlength="8"
+            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}"
+            title="Password must contain at least 8 characters, uppercase, lowercase, number and special character."
+            required
+        >
+
+        <p>Password must contain:</p>
+        <ul>
+            <li>At least 8 characters</li>
+            <li>One uppercase letter</li>
+            <li>One lowercase letter</li>
+            <li>One number</li>
+            <li>One special character</li>
+        </ul>
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login here</a>
+    </p>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVault - Audit Trail</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 25px;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #172554;
+        }
+
+        .status {
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: white;
+            border-left: 5px solid #64748b;
+        }
+
+        .success {
+            border-left-color: #16a34a;
+        }
+
+        .warning {
+            border-left-color: #d97706;
+        }
+
+        .danger {
+            border-left-color: #dc2626;
+        }
+
+        .counts {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .count-box {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .count-box h2 {
+            margin: 0;
+            color: #172554;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th {
+            background: #172554;
+            color: white;
+        }
+
+        .hash {
+            font-family: monospace;
+            word-break: break-all;
+            max-width: 180px;
+        }
+
+        .verified {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .legacy {
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        .invalid {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1d4ed8;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>TrustVault Audit Trail</h1>
+
+    <p>Review document activities and audit record integrity.</p>
+
+    {% if chain_status.chain_ok and chain_status.fully_verified %}
+
+        <div class="status success">
+            <strong>All records verified successfully.</strong>
+            <p>{{ chain_status.message }}</p>
+        </div>
+
+    {% elif chain_status.chain_ok %}
+
+        <div class="status warning">
+            <strong>Legacy records found.</strong>
+            <p>{{ chain_status.message }}</p>
+            <p>
+                Old records are preserved, but their original hash
+                timestamps were not stored. New records are verified.
+            </p>
+        </div>
+
+    {% else %}
+
+        <div class="status danger">
+            <strong>Audit verification failed.</strong>
+            <p>{{ chain_status.message }}</p>
+        </div>
+
+    {% endif %}
+
+
+    <div class="counts">
+
+        <div class="count-box">
+            <h2>{{ logs|length }}</h2>
+            <p>Your displayed audit records</p>
+        </div>
+
+        <div class="count-box">
+            <h2>{{ chain_status.verified_count }}</h2>
+            <p>New verified records</p>
+        </div>
+
+        <div class="count-box">
+            <h2>{{ chain_status.legacy_count }}</h2>
+            <p>Legacy records</p>
+        </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <h2>Audit Records</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Actor ID</th>
+                    <th>Document ID</th>
+                    <th>Action</th>
+                    <th>Date and Time</th>
+                    <th>Hash Version</th>
+                    <th>Entry Hash</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for log in logs %}
+
+                <tr>
+
+                    <td>{{ log.id }}</td>
+
+                    <td>{{ log.actor_id }}</td>
+
+                    <td>
+                        {{ log.document_id if log.document_id else "-" }}
+                    </td>
+
+                    <td>{{ log.action }}</td>
+
+                    <td>
+                        {{ log.created_at if log.created_at else "-" }}
+                    </td>
+
+                    <td>
+                        {% if log.hash_version == 1 %}
+                            <span class="verified">Verified format</span>
+                        {% else %}
+                            <span class="legacy">Legacy</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="hash">
+                        {{ log.entry_hash }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7">No audit records found.</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

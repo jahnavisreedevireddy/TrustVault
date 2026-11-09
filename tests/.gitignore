@@ -1,0 +1,9 @@
+
+venv/
+__pycache__/
+*.py[cod]
+instance/
+*.db
+private_uploads/
+.env
+.pytest_cache/

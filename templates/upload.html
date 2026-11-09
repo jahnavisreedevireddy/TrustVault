@@ -1,0 +1,45 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="form-box">
+
+    <h1>Upload Document</h1>
+    <p>Securely upload your document to TrustVault.</p>
+
+    <form method="POST"
+          action="{{ url_for('upload') }}"
+          enctype="multipart/form-data">
+
+        <input type="hidden"
+               name="csrf_token"
+               value="{{ csrf_token() }}">
+
+        <label>Document Title</label>
+        <input type="text"
+               name="title"
+               placeholder="Enter document title"
+               required>
+
+        <label>Description</label>
+        <textarea name="description"
+                  placeholder="Enter document description"></textarea>
+
+        <label>Select Document</label>
+        <input type="file"
+               name="file"
+               accept=".pdf,.txt,.png,.jpg,.jpeg,.docx"
+               required>
+
+        <button type="submit">Upload Document</button>
+
+    </form>
+
+    <p>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </p>
+
+</div>
+
+{% endblock %}

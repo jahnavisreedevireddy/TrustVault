@@ -1,0 +1,140 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="dashboard">
+
+    <h1>Admin Dashboard</h1>
+
+    <p>Welcome, Administrator!</p>
+
+    <hr>
+
+    <h2>User Management</h2>
+
+    <p>Total Users: {{ users|length }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Current Role</th>
+                <th>Change Role</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+
+                <td>
+                    {% if user.id != current_user.id %}
+                    <form method="POST"
+                          action="{{ url_for('change_user_role', user_id=user.id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <select name="role" required>
+                            <option value="Admin"
+                                {% if user.role == 'Admin' %}selected{% endif %}>
+                                Admin
+                            </option>
+
+                            <option value="Owner"
+                                {% if user.role == 'Owner' %}selected{% endif %}>
+                                Owner
+                            </option>
+
+                            <option value="Viewer"
+                                {% if user.role == 'Viewer' %}selected{% endif %}>
+                                Viewer
+                            </option>
+                        </select>
+
+                        <button type="submit">Update Role</button>
+                    </form>
+                    {% else %}
+                        Current Admin
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Document Management</h2>
+
+    <p>Total Documents: {{ documents|length }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Owner ID</th>
+                <th>File Name</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for doc in documents %}
+            <tr>
+                <td>{{ doc.id }}</td>
+                <td>{{ doc.title }}</td>
+                <td>{{ doc.owner_id }}</td>
+                <td>{{ doc.original_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Audit Trail</h2>
+
+    <p>Recent system activities</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Log ID</th>
+                <th>User ID</th>
+                <th>Document ID</th>
+                <th>Action</th>
+                <th>Date and Time</th>
+                <th>Audit Hash</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>{{ log.actor_id }}</td>
+                <td>{{ log.document_id or '-' }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.created_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                <td>{{ log.entry_hash[:12] }}...</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </p>
+
+</div>
+
+{% endblock %}

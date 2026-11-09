@@ -1,0 +1,204 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="document-card">
+
+    <h1>Document Details</h1>
+
+    <h2>{{ document.title }}</h2>
+
+    <p>
+        <strong>Description:</strong>
+        {{ document.description or "No description available." }}
+    </p>
+
+    <p>
+        <strong>File name:</strong>
+        {{ document.original_name }}
+    </p>
+
+    <p><strong>File SHA-256:</strong></p>
+
+    <p>{{ document.file_hash }}</p>
+
+    <p>
+        <strong>Uploaded on:</strong>
+        {{ document.created_at.strftime('%d-%m-%Y %H:%M') }}
+    </p>
+
+    <a class="button-link"
+       href="{{ url_for('download', document_id=document.id) }}">
+        Download Document
+    </a>
+
+    <!-- ================================= -->
+    <!-- ADMIN AND OWNER MANAGEMENT -->
+    <!-- ================================= -->
+
+    {% if can_manage %}
+
+        <hr>
+
+        <h2>Share Document</h2>
+
+        <form method="POST"
+              action="{{ url_for('share_document', document_id=document.id) }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <label>User Email</label>
+
+            <input type="email"
+                   name="email"
+                   placeholder="Enter registered user's email"
+                   required>
+
+            <label>Access Permission</label>
+
+            <select name="access">
+
+                <option value="read">
+                    Read Only
+                </option>
+
+                <option value="edit">
+                    Read and Edit
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Share Document
+            </button>
+
+        </form>
+
+        <hr>
+
+        <h2>Manage Permissions</h2>
+
+        {% if permissions %}
+
+            {% for permission in permissions %}
+
+                <div class="permission-card">
+
+                    <p>
+                        <strong>User ID:</strong>
+                        {{ permission.user_id }}
+                    </p>
+
+                    <p>
+                        <strong>Permission:</strong>
+
+                        {% if permission.can_edit %}
+                            Read and Edit
+                        {% else %}
+                            Read Only
+                        {% endif %}
+
+                    </p>
+
+                    <form method="POST"
+                          action="{{ url_for('revoke_permission',
+                          document_id=document.id,
+                          user_id=permission.user_id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <button type="submit">
+                            Revoke Access
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                No users have access to this document.
+            </p>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <!-- ================================= -->
+    <!-- ADMIN, OWNER AND EDIT PERMISSION -->
+    <!-- ================================= -->
+
+    {% if can_edit_document %}
+
+        <hr>
+
+        <h2>Edit Document Details</h2>
+
+        <form method="POST"
+              action="{{ url_for('edit_document', document_id=document.id) }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <label>New Title</label>
+
+            <input type="text"
+                   name="title"
+                   value="{{ document.title }}"
+                   required>
+
+            <label>New Description</label>
+
+            <textarea name="description">{{ document.description or "" }}</textarea>
+
+            <button type="submit">
+                Update Document
+            </button>
+
+        </form>
+
+    {% endif %}
+
+
+    <!-- ================================= -->
+    <!-- VIEWER MESSAGE -->
+    <!-- ================================= -->
+
+    {% if not can_edit_document %}
+
+        <hr>
+
+        <p>
+            <strong>Read-only access:</strong>
+            You can view and download this document,
+            but you cannot edit it.
+        </p>
+
+    {% endif %}
+
+
+    <!-- ================================= -->
+    <!-- BACK TO DASHBOARD -->
+    <!-- ================================= -->
+
+    <hr>
+
+    <p>
+        <a href="{{ url_for('dashboard') }}">
+            Back to Dashboard
+        </a>
+    </p>
+
+</div>
+
+{% endblock %}
